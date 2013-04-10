@@ -11,3 +11,8 @@
 *.lai
 *.la
 *.a
+
+# OpenFOAM Specific files
+*.dep
+lnInclude/
+linux*/
