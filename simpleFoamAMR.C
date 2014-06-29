@@ -35,12 +35,8 @@ Description
 
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
-#include "RASModel.H"
+#include "turbulenceModel.H"
 #include "dynamicFvMesh.H"
-
-#include "errorEstimate.H"
-#include "resError.H"
-#include <vector>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -56,15 +52,17 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    while (runTime.loop())
+    while (runTime.run())
     {
-        Info<< "Time = " << runTime.timeName() << nl << endl;
-
 #       include "readSIMPLEControls.H"
 #       include "initConvergenceCheck.H"
 
         // ----- Begin - Dynamic part of the solver ------- //
         fvc::makeAbsolute(phi, U);
+
+        runTime++;
+
+        Info<< "Time = " << runTime.timeName() << nl << endl;
 
         bool meshChanged = mesh.update();
 
@@ -82,28 +80,7 @@ int main(int argc, char *argv[])
 
         turbulence->correct();
 
-        errorEstimate<vector> ee
-        (
-            resError::div(phi,U)
-          - resError::laplacian(turbulence->nuEff(),U)
-          - fvc::div(turbulence->nuEff()*dev(fvc::grad(U)().T()))
-         ==
-          -fvc::grad(p)
-        );
-
-        errField = mag(ee.error());
-        pGrad = mag(fvc::grad(p));
-
         runTime.write();
-
-        Info<< endl
-            << " errField Max = " << max(errField)
-            << " errField Min = " << min(errField)
-            << nl << endl;
-
-        Info<< " pGrad Max = " << max(pGrad)
-            << " pGrad Min = " << min(pGrad)
-            << nl << endl;
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"

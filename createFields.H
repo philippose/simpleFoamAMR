@@ -52,38 +52,9 @@
 
     singlePhaseTransportModel laminarTransport(U, phi);
 
-    autoPtr<incompressible::RASModel> turbulence
+    autoPtr<incompressible::turbulenceModel> turbulence
     (
-        incompressible::RASModel::New(U, phi, laminarTransport)
+        incompressible::turbulenceModel::New(U, phi, laminarTransport)
     );
 
-
-    volScalarField errField
-    (
-        IOobject
-        (
-            "errField",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedScalar("errField", dimensionSet(0,1,-1,0,0,0,0), 0.0)
-    );
-
-
-    volScalarField pGrad
-    (
-        IOobject
-        (
-            "pGrad",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedScalar("pGrad", dimensionSet(0,1,-2,0,0,0,0), 0.0)
-    );
 
